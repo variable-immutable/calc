@@ -21,7 +21,7 @@ long long int expr_calc(list_t *expr) {
     }
 
     long long int result = 0;
-    //stack_t *operands = stack_init();
+    stack_t *operands = stack_init(sizeof(long long int));
 
     return result;
 }
@@ -30,11 +30,14 @@ list_t *get_expr() {
     bool end_expr = false;
     bool digit_end = false;
     list_t *expression = list_init();
-    stack_t *operators = stack_init();
+    stack_t *operators = stack_init(sizeof(char));
 
     while(!end_expr) {
         char ch = getc(stdin);
-        char op_top = stack_peek(operators);
+        char op_top;
+        if(!stack_peek(operators, &op_top)) {
+            op_top = 0;
+        }
 
         if(is_end_expr(ch)) {
             if(ch == EOF) printf("\n");
@@ -43,7 +46,7 @@ list_t *get_expr() {
                 end_expr = true;
             } else if(is_operator(op_top)) {
                 add_delim(expression, true);
-                list_push(expression, stack_pop(operators));
+                list_push(expression, *(char *) stack_pop(operators));
                 ungetc(ch, stdin);
             } else if(is_l_bracket(op_top)) {
                 printf("Лишний символ '%c'\n", ch);
@@ -60,10 +63,10 @@ list_t *get_expr() {
         else if(is_plus_or_minus(ch)) {
             if(stack_is_empty(operators) || is_l_bracket(op_top)) {
                 digit_end = true;
-                stack_push(operators, ch);
+                stack_push(operators, &ch);
             } else if(is_operator(op_top)) {
                 add_delim(expression, true);
-                list_push(expression, stack_pop(operators));
+                list_push(expression, *(char *) stack_pop(operators));
                 ungetc(ch, stdin);
             }
         }
@@ -71,10 +74,10 @@ list_t *get_expr() {
         else if(is_mult_or_div(ch)) {
             if(stack_is_empty(operators) || is_plus_or_minus(op_top) || is_l_bracket(op_top)) {
                 digit_end = true;
-                stack_push(operators, ch);
+                stack_push(operators, &ch);
             } else if (is_mult_or_div(op_top)) {
                 add_delim(expression, true);
-                list_push(expression, stack_pop(operators));
+                list_push(expression, *(char *) stack_pop(operators));
                 ungetc(ch, stdin);
             }
         }
@@ -85,7 +88,7 @@ list_t *get_expr() {
                 exit(0);
             } else if(is_operator(op_top)) {
                 add_delim(expression, true);
-                list_push(expression, stack_pop(operators));
+                list_push(expression, *(char *) stack_pop(operators));
                 ungetc(ch, stdin);
             } else if(is_l_bracket(op_top)) {
                 stack_pop(operators);
@@ -94,7 +97,7 @@ list_t *get_expr() {
 
         else if(is_l_bracket(ch)) {
             digit_end = true;
-            stack_push(operators, ch);
+            stack_push(operators, &ch);
         }
 
         else if(is_whitespace(ch)) {
