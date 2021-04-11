@@ -6,13 +6,16 @@
 
 stack_t *stack_init(size_t type_size) {
     stack_t *stack = malloc(sizeof(stack_t));
+
+    stack->top = NULL;
     stack->size = 0;
     stack->type_size = type_size;
+
     return stack;
 }
 
 void stack_push(stack_t *stack, void *val) {
-    stack->top = realloc(stack->top, sizeof(stack->type_size) + sizeof(stack->type_size) * stack->size);
+    stack->top = realloc(stack->top, stack->type_size + stack->type_size * stack->size);
     memcpy(stack->top + (stack->type_size * stack->size), val, stack->type_size);
     stack->size++;
 }

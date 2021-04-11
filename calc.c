@@ -20,8 +20,28 @@ long long int expr_calc(list_t *expr) {
         exit(0);
     }
 
+    char ch;
+    bool is_dig = false;
     long long int result = 0;
     stack_t *operands = stack_init(sizeof(long long int));
+    stack_t *digit = stack_init(sizeof(char));
+    list_iter_t *iter = list_get_iter(expr);
+
+    while((ch = list_iter_next(iter))) {
+        if(is_digit(ch)) {
+            is_dig = true;
+            stack_push(digit, &ch);
+        } else if(is_dig) {
+            is_dig = false;
+            long long int dig = ch_stack_join_in_lli(digit);
+            stack_push(operands,  &dig);
+        }
+
+        if(is_operator(ch)) {
+            long long int r_op = *(long long int *) stack_pop(operands);
+            long long int l_op = *(long long int *) stack_pop(operands);
+        }
+    }
 
     return result;
 }
@@ -150,4 +170,17 @@ void add_delim(list_t *expr, bool digit_end) {
     if(digit_end && expr->size) {
         list_push(expr, DELIM);
     }
+}
+
+long long int ch_stack_join_in_lli(stack_t *stack) {
+    long long int result = 0;
+    char *ch;
+    int mult = 1;
+
+    while((ch = stack_pop(stack))) {
+        result += (*(char *) ch - '0') * mult;
+        mult *= 10; 
+    }
+
+    return result;
 }

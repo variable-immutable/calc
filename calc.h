@@ -31,4 +31,6 @@ bool is_end_expr(char ch);
 
 void add_delim(list_t *expr, bool digit_end);
 
+long long int ch_stack_join_in_lli(stack_t *stack);
+
 #endif
