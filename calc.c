@@ -38,6 +38,8 @@ long long int expr_calc(list_t *expr) {
         }
 
         if(is_operator(ch)) {
+            if (operands->size < 2) { break; /* TODO унарные операции */ }
+
             long long int r_op = *(long long int *) stack_pop(operands);
             long long int l_op = *(long long int *) stack_pop(operands);
 
