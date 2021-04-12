@@ -22,7 +22,7 @@ long long int expr_calc(list_t *expr) {
 
     char ch;
     bool is_dig = false;
-    long long int result = 0;
+    long long int value = 0;
     stack_t *operands = stack_init(sizeof(long long int));
     stack_t *digit = stack_init(sizeof(char));
     list_iter_t *iter = list_get_iter(expr);
@@ -33,17 +33,54 @@ long long int expr_calc(list_t *expr) {
             stack_push(digit, &ch);
         } else if(is_dig) {
             is_dig = false;
-            long long int dig = ch_stack_join_in_lli(digit);
-            stack_push(operands,  &dig);
+            value = ch_stack_join_in_lli(digit);
+            stack_push(operands,  &value);
         }
 
         if(is_operator(ch)) {
             long long int r_op = *(long long int *) stack_pop(operands);
             long long int l_op = *(long long int *) stack_pop(operands);
+
+            switch(ch) {
+                case '+':
+                    value = l_op + r_op;
+                    stack_push(operands, &value);
+                    break;
+
+                case '-':
+                    value = l_op - r_op;
+                    stack_push(operands, &value);
+                    break;
+
+                case '*':
+                    value = l_op * r_op;
+                    stack_push(operands, &value);
+                    break;
+
+                case '/':
+                    value = l_op / r_op;
+                    stack_push(operands, &value);
+                    break;
+
+                case '%':
+                    value = l_op % r_op;
+                    stack_push(operands, &value);
+                    break;
+
+            }
         }
     }
+    
+    if(operands->size == 1) {
+        value = *(long long int *) stack_pop(operands);
+        stack_free(operands);
+        stack_free(digit);
 
-    return result;
+        return value; 
+    }
+
+    printf("Неверно составлено выражение\n");
+    exit(0);
 }
 
 list_t *get_expr() {
